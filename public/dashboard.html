@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+}
+h1 {
+    color: #333;
+}
+</style>
+</head>
+<body>
+<h1 id="welcome">Welcome to your dashboard</h1>
+
+<script>
+(async () => {
+    const token = localStorage.getItem('sessionToken');
+    if (!token) {
+        window.location.href = '/index.html';
+        return;
+    }
+
+    // Check session
+    const res = await fetch('/api/check-session', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({token})
+    });
+    const result = await res.json();
+    if (!result.valid) {
+        window.location.href = '/index.html';
+        return;
+    }
+
+    // Fetch user info from D1 (you can make a new endpoint or include username in check-session)
+    const userRes = await fetch('/api/get-user', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({token})
+    });
+    const userData = await userRes.json();
+
+    document.getElementById('welcome').textContent = `Welcome ${userData.username} to your dashboard`;
+})();
+</script>
+</body>
+</html>
