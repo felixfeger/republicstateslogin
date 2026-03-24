@@ -4,52 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 50px;
-}
-h1 {
-    color: #333;
-}
-</style>
+<style>body{font-family:Arial,sans-serif;background:#f0f2f5;display:flex;flex-direction:column;align-items:center;padding-top:50px;}h1{color:#333;}</style>
 </head>
 <body>
 <h1 id="welcome">Welcome to your dashboard</h1>
-
 <script>
-(async () => {
-    const token = localStorage.getItem('sessionToken');
-    if (!token) {
-        window.location.href = '/index.html';
-        return;
-    }
+const WORKER_URL = 'https://sso-api.felixfeger46.workers.dev';
 
-    // Check session
-    const res = await fetch('/api/check-session', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({token})
-    });
-    const result = await res.json();
-    if (!result.valid) {
-        window.location.href = '/index.html';
-        return;
-    }
-
-    // Fetch user info from D1 (you can make a new endpoint or include username in check-session)
-    const userRes = await fetch('/api/get-user', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({token})
-    });
-    const userData = await userRes.json();
-
-    document.getElementById('welcome').textContent = `Welcome ${userData.username} to your dashboard`;
+(async()=>{
+  const token = localStorage.getItem('sessionToken');
+  if(!token){window.location.href='/index.html';return;}
+  const res = await fetch(`${WORKER_URL}/check-session`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});
+  const check = await res.json();
+  if(!check.valid){window.location.href='/index.html';return;}
+  const userRes = await fetch(`${WORKER_URL}/get-user`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});
+  const user = await userRes.json();
+  document.getElementById('welcome').textContent = `Welcome ${user.username} to your dashboard`;
 })();
 </script>
 </body>
